@@ -1,0 +1,1400 @@
+/* ==========================================================================
+   Rotas Duas Rodas — Santa Catarina 3D & Tour 360°
+   Estética "Serra & Asfalto": ardósia quente, âmbar rodoviário e verde serrano
+   ========================================================================== */
+
+:root {
+  --bg-asphalt: #111619;
+  --surface: rgba(19, 25, 29, 0.88);
+  --surface-solid: #161d22;
+  --surface-elevated: rgba(27, 35, 41, 0.94);
+  --border-subtle: rgba(255, 255, 255, 0.11);
+  --border-strong: rgba(255, 255, 255, 0.22);
+
+  --text-primary: #f3f6f8;
+  --text-secondary: #a4b3be;
+  --text-muted: #768896;
+
+  --accent-amber: #f59e0b;
+  --accent-emerald: #10b981;
+  --accent-sky: #38bdf8;
+  --accent-danger: #ef4444;
+
+  --paper: #faf9f5;
+  --paper-ink: #1b242b;
+
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: "Merriweather", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-lg: 0 20px 44px rgba(0, 0, 0, 0.45);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-asphalt);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input {
+  font-family: inherit;
+}
+
+/* ==========================================================================
+   1. VIEWPORT 3D & PINS FLUTUANTES
+   ========================================================================== */
+#viewport3D {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+#pins3DLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.pin3d {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px 6px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(16, 22, 26, 0.9);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42);
+  transition: opacity 0.2s ease, background 0.18s ease, border-color 0.18s ease;
+  will-change: transform;
+}
+
+.pin3d::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pin-color, var(--accent-amber));
+  box-shadow: 0 0 0 3px rgba(16, 22, 26, 0.85);
+}
+
+.pin3d:hover,
+.pin3d.is-active {
+  background: #ffffff;
+  color: #111619;
+  border-color: #ffffff;
+  z-index: 8;
+}
+
+.pin3d-overview {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.pin3d-code {
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--pin-color, var(--accent-amber));
+  color: #111619;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   2. BARRA SUPERIOR DE ROTAS
+   ========================================================================== */
+.top-bar {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.top-bar > * {
+  pointer-events: auto;
+}
+
+.brand-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-lg);
+}
+
+.brand-emblem {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--accent-amber);
+  color: #111619;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.brand-text span {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.route-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-lg);
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.route-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.16s ease;
+}
+
+.route-nav-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.route-nav-btn.is-active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.highway-shield {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--shield-color, var(--accent-amber));
+  color: #0e1316;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.top-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.16s ease;
+}
+
+.icon-pill-btn:hover {
+  background: var(--surface-elevated);
+  border-color: var(--border-strong);
+}
+
+.icon-pill-btn.is-accent {
+  background: var(--accent-amber);
+  color: #111619;
+  border-color: transparent;
+}
+
+.icon-pill-btn.is-accent:hover {
+  filter: brightness(1.06);
+}
+
+/* ==========================================================================
+   3. PAINEL LATERAL ESQUERDO — GUIA DA ROTA & PARADAS
+   ========================================================================== */
+.route-drawer {
+  position: fixed;
+  top: 76px;
+  left: 14px;
+  bottom: 92px;
+  width: 332px;
+  z-index: 18;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.route-drawer.is-collapsed {
+  transform: translateX(-360px);
+}
+
+.drawer-header {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.drawer-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.route-code-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #0e1316;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.drawer-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.route-subtitle {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.drawer-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 16px;
+}
+
+.drawer-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.drawer-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 99px;
+}
+
+.route-summary {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #ced8df;
+}
+
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-cell {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stat-cell span {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.stat-cell strong {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: var(--text-primary);
+}
+
+.elev-wrap {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.elev-label {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.elev-svg {
+  width: 100%;
+  height: 54px;
+  display: block;
+}
+
+.rider-meta-box {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  font-size: 11.8px;
+  line-height: 1.45;
+  color: #e9d8be;
+}
+
+.rider-meta-box strong {
+  color: #fbbf24;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.filter-chip {
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-chip:hover {
+  color: var(--text-primary);
+}
+
+.filter-chip.is-active {
+  background: #ffffff;
+  color: #111619;
+  border-color: #ffffff;
+}
+
+.stops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stop-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.stop-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.stop-item.is-active {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+.stop-item-icon {
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.stop-item-text strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.stop-item-text small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   4. CARTÃO DE DETALHE DO PONTO DE PARADA
+   ========================================================================== */
+.stop-detail-card {
+  position: fixed;
+  left: 362px;
+  bottom: 94px;
+  width: 348px;
+  max-width: calc(100vw - 28px);
+  z-index: 22;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-strong);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stop-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.stop-card-cat {
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.close-mini-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.stop-detail-card h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.stop-detail-card p {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  line-height: 1.48;
+  color: #d2dce3;
+}
+
+.stop-info-block {
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.045);
+  margin-bottom: 8px;
+  font-size: 11.8px;
+  line-height: 1.42;
+}
+
+.stop-info-block strong {
+  display: block;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.stop-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn-primary-360 {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 0;
+  background: var(--accent-emerald);
+  color: #062118;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-primary-360:hover {
+  filter: brightness(1.07);
+}
+
+.btn-secondary-ride {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Toast de aproximação de parada */
+.approach-toast {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  z-index: 19;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(16, 22, 26, 0.92);
+  border: 1px solid var(--border-strong);
+  font-size: 12.5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.approach-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================================================
+   5. HUD INFERIOR — TELEMETRIA & CONTROLES DA MOTO 3D
+   ========================================================================== */
+.hud-bar {
+  position: fixed;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-lg);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hud-bar.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+
+.hud-play-btn {
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 0;
+  background: var(--accent-amber);
+  color: #111619;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.speed-group,
+.cam-group {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  gap: 2px;
+}
+
+.speed-btn,
+.cam-btn {
+  padding: 6px 9px;
+  border-radius: 7px;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.speed-btn.is-active,
+.cam-btn.is-active {
+  background: #ffffff;
+  color: #111619;
+}
+
+.scrubber-wrap {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+}
+
+#routeScrubber {
+  width: 100%;
+  accent-color: var(--accent-amber);
+  cursor: pointer;
+}
+
+.telemetry-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px;
+}
+
+.tel-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 52px;
+}
+
+.tel-item span {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.tel-item strong {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.hud-extra-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hud-extra-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.hud-extra-btn.is-360 {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #6ee7b7;
+}
+
+/* ==========================================================================
+   6. PAINEL DIREITO — CHAT COPILOTO DUAS RODAS
+   ========================================================================== */
+.chat-drawer {
+  position: fixed;
+  top: 76px;
+  right: 14px;
+  bottom: 92px;
+  width: 356px;
+  max-width: calc(100vw - 28px);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-strong);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(390px);
+  transition: transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.chat-drawer.is-open {
+  transform: translateX(0);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 800;
+}
+
+.chat-header small {
+  display: block;
+  font-size: 11px;
+  color: var(--accent-emerald);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-msg {
+  max-width: 92%;
+  padding: 10px 12px;
+  border-radius: 13px;
+  font-size: 12.5px;
+  line-height: 1.48;
+}
+
+.chat-msg-bot {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e4ecf1;
+}
+
+.chat-msg-user {
+  align-self: flex-end;
+  background: var(--accent-amber);
+  color: #111619;
+  font-weight: 600;
+}
+
+.chat-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.chat-action-btn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(16, 22, 26, 0.72);
+  color: #f3f6f8;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chat-action-btn:hover {
+  background: #ffffff;
+  color: #111619;
+}
+
+.chat-quick-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px 4px;
+  overflow-x: auto;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.chat-quick-chip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chat-quick-chip:hover {
+  color: #ffffff;
+  border-color: var(--border-strong);
+}
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px 12px;
+}
+
+.chat-form input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  font-size: 12.5px;
+  outline: none;
+}
+
+.chat-form input:focus {
+  border-color: var(--accent-amber);
+}
+
+.chat-form button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 0;
+  background: var(--accent-amber);
+  color: #111619;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   7. OVERLAY TOUR VIRTUAL 360° (VIRTUAL TOUR 360 LOGIC — GEOHEREDITAS)
+   ========================================================================== */
+.tour360-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: #0d1216;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.tour360-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#pano360Canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  display: block;
+}
+
+#pano360Canvas:active {
+  cursor: grabbing;
+}
+
+#pano360Hotspots,
+#pano360Labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.pano360-topbar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 65;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.pano360-topbar > * {
+  pointer-events: auto;
+}
+
+.pano360-back-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(16, 22, 26, 0.88);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pano360-pills {
+  display: flex;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(16, 22, 26, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  overflow-x: auto;
+  max-width: 64vw;
+}
+
+.pano-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pano-pill.is-active {
+  background: var(--accent-emerald);
+  color: #062118;
+}
+
+.pano360-title-badge {
+  position: absolute;
+  top: 72px;
+  left: 16px;
+  z-index: 64;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(16, 22, 26, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+}
+
+.pano360-title-badge h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.pano360-title-badge p {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.hs360-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(15, 22, 26, 0.88);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+  transition: opacity 0.15s ease;
+}
+
+.hs360-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent-emerald);
+  color: #062118;
+  font-weight: 900;
+}
+
+.hs360-scene .hs360-dot {
+  background: var(--accent-amber);
+  color: #111619;
+}
+
+.label360-float {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 6px 11px;
+  border-radius: 8px;
+  background: rgba(12, 18, 22, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  text-align: center;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.label360-float strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.label360-float span {
+  display: block;
+  font-size: 10.5px;
+  color: #cbd5e1;
+}
+
+.pano360-dock {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 65;
+  display: flex;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(16, 22, 26, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.dock360-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dock360-btn.is-active {
+  background: var(--accent-emerald);
+  color: #062118;
+}
+
+/* Estúdio Criador 360° (Pilar D) */
+.creator-panel-360 {
+  position: absolute;
+  right: 18px;
+  bottom: 84px;
+  width: 310px;
+  z-index: 66;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(16, 22, 26, 0.94);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  box-shadow: var(--shadow-lg);
+}
+
+.creator-panel-360 h4 {
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  color: #6ee7b7;
+}
+
+.creator-panel-360 label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 8px 0 4px;
+}
+
+.creator-panel-360 input[type="text"],
+.creator-panel-360 input[type="number"] {
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.creator-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.creator-hint {
+  margin: 8px 0;
+  font-size: 11px;
+  color: #fbbf24;
+  line-height: 1.4;
+}
+
+.creator-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Modal Split-View Editorial (Geohereditas Style) */
+.split-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(8, 12, 16, 0.78);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.split-modal-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.split-modal-window {
+  width: 920px;
+  max-width: 100%;
+  max-height: 86vh;
+  display: grid;
+  grid-template-columns: 56% 44%;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--paper-ink);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
+}
+
+.split-left {
+  background: #132230;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.split-editorial-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.split-right {
+  position: relative;
+  padding: 26px 26px 24px;
+  overflow-y: auto;
+}
+
+.split-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--accent-emerald);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.split-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #059669;
+  margin-bottom: 6px;
+}
+
+.split-right h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-serif);
+  font-size: 21px;
+  line-height: 1.28;
+  color: #111827;
+}
+
+.split-subtitle {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #047857;
+}
+
+.split-desc {
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.split-sticky-note {
+  padding: 13px 15px;
+  border-radius: 8px;
+  background: #fef3c7;
+  border-left: 4px solid #d97706;
+  transform: rotate(-0.8deg);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #451a03;
+}
+
+.split-sticky-note strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #92400e;
+}
+
+/* ==========================================================================
+   8. MODAL MAPA SATÉLITE 2D (LEAFLET)
+   ========================================================================== */
+.map2d-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(8, 12, 16, 0.78);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.map2d-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.map2d-window {
+  width: 980px;
+  max-width: 100%;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--surface-solid);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+}
+
+.map2d-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.map2d-header h3 {
+  margin: 0;
+  font-size: 14.5px;
+}
+
+#leafletMapContainer {
+  flex: 1;
+  width: 100%;
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE
+   ========================================================================== */
+@media (max-width: 1080px) {
+  .telemetry-strip {
+    display: none;
+  }
+  .route-drawer {
+    width: 290px;
+  }
+  .stop-detail-card {
+    left: 14px;
+  }
+}
+
+@media (max-width: 780px) {
+  .brand-text span {
+    display: none;
+  }
+  .route-nav-name {
+    display: none;
+  }
+  .route-drawer {
+    width: calc(100vw - 28px);
+    max-height: 46vh;
+    bottom: auto;
+  }
+  .split-modal-window {
+    grid-template-columns: 1fr;
+  }
+  .split-left {
+    height: 220px;
+  }
+}

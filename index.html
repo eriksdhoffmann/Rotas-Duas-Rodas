@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rotas Duas Rodas SC — Mapa 3D, Motocicleta Interativa, Chat Copiloto &amp; Tour 360°</title>
+  <meta name="description" content="Explore de moto em 3D e Tour Virtual 360° as 3 rotas mais icônicas de Santa Catarina: Serra do Rio do Rastro (SC-390), Serra do Corvo Branco (SC-370) e Serra Dona Francisca (SC-418)." />
+  <link rel="icon" href="data:," />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700;800&family=Merriweather:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- 1. VIEWPORT 3D PRINCIPAL (TERRENO SERRANO + MOTO 3D) -->
+  <main id="viewport3D" aria-label="Mapa 3D interativo das rotas de moto de Santa Catarina"></main>
+  <div id="pins3DLayer" aria-label="Pontos de parada interativos no mapa 3D"></div>
+
+  <!-- 2. BARRA SUPERIOR DE NAVEGAÇÃO -->
+  <header class="top-bar">
+    <div class="brand-pill">
+      <div class="brand-emblem" aria-hidden="true">🏍</div>
+      <div class="brand-text">
+        <h1>Rotas Duas Rodas · SC</h1>
+        <span>Mapa 3D · Tour Virtual 360°</span>
+      </div>
+    </div>
+
+    <nav class="route-nav-group" aria-label="Principais rotas de moto de Santa Catarina">
+      <div id="routeNavBar" style="display:flex;gap:6px;"></div>
+      <button type="button" id="btnOverviewSC" class="route-nav-btn" title="Visualizar as 3 rotas conectadas em Santa Catarina">
+        🗺️ <span class="route-nav-name">Mapa Geral SC</span>
+      </button>
+    </nav>
+
+    <div class="top-right-actions">
+      <button type="button" id="btnToggleRouteDrawer" class="icon-pill-btn" title="Mostrar ou ocultar painel da rota">
+        📋 Guia &amp; Paradas
+      </button>
+      <button type="button" id="btnToggleChat" class="icon-pill-btn is-accent" title="Abrir Chat Copiloto Duas Rodas">
+        💬 Chat Copiloto
+      </button>
+    </div>
+  </header>
+
+  <!-- Toast de aproximação de parada -->
+  <div id="approachToast" class="approach-toast" role="status" aria-live="polite"></div>
+
+  <!-- 3. PAINEL LATERAL ESQUERDO — GUIA DA ROTA & PONTOS DE PARADA -->
+  <aside id="routeDrawer" class="route-drawer" aria-label="Detalhes e paradas da rota">
+    <div class="drawer-header">
+      <div class="drawer-top-row">
+        <span id="routeCodeBadge" class="route-code-badge">SC-390</span>
+      </div>
+      <h2 id="routeTitle">Serra do Rio do Rastro</h2>
+      <p id="routeSubtitle" class="route-subtitle">Lauro Müller ↔ Bom Jardim da Serra</p>
+    </div>
+
+    <div class="drawer-scroll">
+      <p id="routeSummary" class="route-summary"></p>
+
+      <div class="stats-strip">
+        <div class="stat-cell">
+          <span>Extensão</span>
+          <strong id="statDist">35 km</strong>
+        </div>
+        <div class="stat-cell">
+          <span>Alt. Máx</span>
+          <strong id="statAlt">1460 m</strong>
+        </div>
+        <div class="stat-cell">
+          <span>Curvas</span>
+          <strong id="statCurves">284</strong>
+        </div>
+      </div>
+
+      <div class="elev-wrap">
+        <div class="elev-label">Perfil Altimétrico da Serra</div>
+        <div id="elevationChart"></div>
+      </div>
+
+      <div class="rider-meta-box">
+        <div><strong>Piso:</strong> <span id="routePiso"></span></div>
+        <div style="margin-top:4px;"><strong>Clima &amp; Alerta:</strong> <span id="routeAlert"></span></div>
+      </div>
+
+      <p class="section-label">Onde Parar na Rota</p>
+      <div class="filter-row" role="group" aria-label="Filtrar pontos de parada">
+        <button type="button" class="filter-chip is-active" data-filter="all">Todos</button>
+        <button type="button" class="filter-chip" data-filter="mirante">⛰️ Mirantes</button>
+        <button type="button" class="filter-chip" data-filter="parada">☕ Café</button>
+        <button type="button" class="filter-chip" data-filter="apoio">⛽ Posto</button>
+        <button type="button" class="filter-chip" data-filter="tecnico">🏍️ Técnico</button>
+      </div>
+
+      <div id="stopsList" class="stops-list"></div>
+    </div>
+  </aside>
+
+  <!-- 4. CARTÃO FLUTUANTE DE DETALHE DO PONTO DE PARADA -->
+  <section id="stopDetailCard" class="stop-detail-card" hidden aria-label="Detalhes do ponto de parada">
+    <div class="stop-card-top">
+      <span id="stopCardCat" class="stop-card-cat"></span>
+      <button type="button" id="btnCloseStopCard" class="close-mini-btn" aria-label="Fechar detalhes">×</button>
+    </div>
+    <h3 id="stopCardTitle"></h3>
+    <p id="stopCardSummary"></p>
+    <div class="stop-info-block">
+      <strong>O que tem para motociclistas</strong>
+      <span id="stopCardInfra"></span>
+    </div>
+    <div class="stop-info-block">
+      <strong>Dica do Piloto</strong>
+      <span id="stopCardTip"></span>
+    </div>
+    <div class="stop-card-actions">
+      <button type="button" id="btnStopOpen360" class="btn-primary-360">🌐 Abrir Tour 360°</button>
+      <button type="button" id="btnStopResumeRide" class="btn-secondary-ride">▶ Seguir Viagem</button>
+    </div>
+  </section>
+
+  <!-- 5. HUD INFERIOR — CONTROLES DA MOTO 3D & TELEMETRIA -->
+  <footer id="hudBar" class="hud-bar" role="toolbar" aria-label="Controles da motocicleta 3D">
+    <button type="button" id="btnPlayPause" class="hud-play-btn is-playing">⏸ Pausar</button>
+
+    <div class="speed-group" aria-label="Velocidade da simulação">
+      <button type="button" class="speed-btn" data-speed="0.5">0.5x</button>
+      <button type="button" class="speed-btn is-active" data-speed="1">1x</button>
+      <button type="button" class="speed-btn" data-speed="2">2x</button>
+    </div>
+
+    <div class="scrubber-wrap">
+      <input type="range" id="routeScrubber" min="0" max="1000" value="40" aria-label="Posição da moto ao longo da rota" />
+    </div>
+
+    <div class="telemetry-strip" aria-label="Telemetria em tempo real">
+      <div class="tel-item">
+        <span>Altitude</span>
+        <strong id="telAlt">220 m</strong>
+      </div>
+      <div class="tel-item">
+        <span>Vel.</span>
+        <strong id="telSpeed">52 km/h</strong>
+      </div>
+      <div class="tel-item">
+        <span>Inclinação</span>
+        <strong id="telLean">0°</strong>
+      </div>
+      <div class="tel-item">
+        <span>Trecho</span>
+        <strong id="telKm">0.0 km</strong>
+      </div>
+    </div>
+
+    <div class="cam-group" aria-label="Modo de câmera 3D">
+      <button type="button" class="cam-btn is-active" data-cam="chase">🏍️ Moto</button>
+      <button type="button" class="cam-btn" data-cam="rider">🪖 Piloto</button>
+      <button type="button" class="cam-btn" data-cam="orbit">🌍 Livre</button>
+    </div>
+
+    <button type="button" id="btnOpenNearest360" class="hud-extra-btn is-360" title="Abrir Tour Virtual 360° do ponto mais próximo">
+      🌐 Tour 360°
+    </button>
+    <button type="button" id="btnOpenMap2D" class="hud-extra-btn" title="Abrir Mapa Satélite 2D com GPS real">
+      🛰️ Satélite
+    </button>
+  </footer>
+
+  <!-- 6. PAINEL DIREITO — CHAT COPILOTO DUAS RODAS -->
+  <aside id="chatDrawer" class="chat-drawer is-open" aria-label="Chat Copiloto Duas Rodas">
+    <div class="chat-header">
+      <div>
+        <h3>Copiloto Duas Rodas</h3>
+        <small>● Conectado ao Mapa 3D &amp; Tour 360°</small>
+      </div>
+      <button type="button" id="btnCloseChat" class="close-mini-btn" aria-label="Fechar chat">×</button>
+    </div>
+
+    <div id="chatMessages" class="chat-messages"></div>
+
+    <div class="chat-quick-bar">
+      <button type="button" class="chat-quick-chip" data-prompt="Onde parar para café e gasolina na Serra do Rio do Rastro?">☕ Paradas SC-390</button>
+      <button type="button" class="chat-quick-chip" data-prompt="Me mostra a Serra do Corvo Branco e o corte de 90m">⛰️ Corvo Branco</button>
+      <button type="button" class="chat-quick-chip" data-prompt="Roteiro de 2 dias ligando Rio do Rastro e Corvo Branco">🗓️ Roteiro 2 dias</button>
+      <button type="button" class="chat-quick-chip" data-prompt="Qual rota é melhor para moto Big Trail ou Custom?">🏍️ Por estilo de moto</button>
+      <button type="button" class="chat-quick-chip" data-prompt="Quero ver a Serra Dona Francisca em Joinville">🌲 Dona Francisca</button>
+    </div>
+
+    <form id="chatForm" class="chat-form">
+      <input type="text" id="chatInput" placeholder="Pergunte sobre paradas, curvas, 360°..." autocomplete="off" />
+      <button type="submit">Enviar</button>
+    </form>
+  </aside>
+
+  <!-- 7. OVERLAY TOUR VIRTUAL 360° (VIRTUAL TOUR 360 LOGIC — GEOHEREDITAS) -->
+  <section id="tour360Overlay" class="tour360-overlay" aria-hidden="true" aria-label="Tour Virtual 360 Graus">
+    <canvas id="pano360Canvas"></canvas>
+    <div id="pano360Labels"></div>
+    <div id="pano360Hotspots"></div>
+
+    <div class="pano360-topbar">
+      <button type="button" id="btnClose360" class="pano360-back-btn">← Voltar à Moto 3D</button>
+      <div id="pano360Pills" class="pano360-pills" aria-label="Cenas 360° disponíveis"></div>
+    </div>
+
+    <div class="pano360-title-badge">
+      <h2 id="pano360Title">Mirante 360°</h2>
+      <p id="pano360Sub">Arraste para girar · Role para dar zoom</p>
+    </div>
+
+    <div class="pano360-dock" role="toolbar" aria-label="Controles do Tour 360°">
+      <button type="button" id="btn360AutoRotate" class="dock360-btn">▶ Giro Automático</button>
+      <button type="button" id="btn360Labels" class="dock360-btn">Aa Rótulos 3D</button>
+      <button type="button" id="btn360Creator" class="dock360-btn">🛠️ Estúdio Criador 360°</button>
+    </div>
+
+    <!-- Estúdio Criador 360° (Pilar D: Raycasting Inverso + Upload de Foto 360° própria) -->
+    <div id="creatorPanel360" class="creator-panel-360" hidden>
+      <h4>🛠️ Estúdio Criador 360°</h4>
+      <label for="creatorPhotoInput">📷 Testar sua própria Foto 360° (Drone / Insta360)</label>
+      <input type="file" id="creatorPhotoInput" accept="image/*" />
+
+      <div class="creator-grid-2">
+        <div>
+          <label for="creatorYaw">Yaw (°)</label>
+          <input type="number" id="creatorYaw" step="0.1" placeholder="Clique na foto" />
+        </div>
+        <div>
+          <label for="creatorPitch">Pitch (°)</label>
+          <input type="number" id="creatorPitch" step="0.1" placeholder="Clique na foto" />
+        </div>
+      </div>
+
+      <label for="creatorTitle">Título da Parada / Ponto</label>
+      <input type="text" id="creatorTitle" placeholder="Ex.: Mirante do Café na Curva" />
+
+      <label for="creatorDesc">Dica para Motociclistas</label>
+      <input type="text" id="creatorDesc" placeholder="Ex.: Bom recuo para estacionar 5 motos" />
+
+      <p id="creatorCoordsHint" class="creator-hint">
+        Clique em qualquer lugar da foto 360° para capturar Pitch e Yaw exatos.
+      </p>
+
+      <div class="creator-btn-row">
+        <button type="button" id="btnCreatorAddHotspot" class="btn-primary-360">Ancorar Ponto</button>
+        <button type="button" id="btnCreatorExport" class="btn-secondary-ride">Exportar JSON</button>
+      </div>
+    </div>
+
+    <!-- Modal Split-View Editorial (Geohereditas Style) -->
+    <div id="splitModal360" class="split-modal-backdrop" role="dialog" aria-modal="true">
+      <div class="split-modal-window">
+        <div id="splitModalVisual" class="split-left"></div>
+        <div class="split-right">
+          <button type="button" id="btnCloseSplitModal" class="split-close-btn" aria-label="Fechar modal">×</button>
+          <span id="splitModalBadge" class="split-badge">Ponto Motociclista</span>
+          <h3 id="splitModalTitle"></h3>
+          <p id="splitModalSubtitle" class="split-subtitle"></p>
+          <p id="splitModalDesc" class="split-desc"></p>
+          <div class="split-sticky-note">
+            <strong>Dica do Piloto · Você sabia?</strong>
+            <span id="splitModalTip"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. MODAL MAPA SATÉLITE 2D (LEAFLET GPS REAL) -->
+  <section id="map2DModal" class="map2d-modal" role="dialog" aria-modal="true" aria-label="Mapa Satélite 2D das rotas">
+    <div class="map2d-window">
+      <div class="map2d-header">
+        <h3>🛰️ Mapa Satélite GPS — SC-390, SC-370 &amp; SC-418 (Clique em qualquer ponto para levar a Moto 3D)</h3>
+        <button type="button" id="btnCloseMap2D" class="close-mini-btn" aria-label="Fechar mapa satélite">×</button>
+      </div>
+      <div id="leafletMapContainer"></div>
+    </div>
+  </section>
+
+  <!-- Bibliotecas 3D locais (funciona 100% offline / file://) -->
+  <script src="js/vendor/three.min.js"></script>
+  <script src="js/vendor/OrbitControls.js"></script>
+
+  <!-- Módulos da Aplicação -->
+  <script src="js/rotas-data.js"></script>
+  <script src="js/panorama-generator.js"></script>
+  <script src="js/engine360.js"></script>
+  <script src="js/terrain-moto-3d.js"></script>
+  <script src="js/chat-copiloto.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
