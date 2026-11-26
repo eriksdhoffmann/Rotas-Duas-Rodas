@@ -757,8 +757,11 @@ window.TerrainMoto3D = (function () {
     }
   }
 
+  let renderPaused = false;
+
   function animate() {
     requestAnimationFrame(animate);
+    if (renderPaused) return;
     const dt = Math.min(0.05, clock.getDelta());
 
     if (!isOverview && currentCurve) {
@@ -778,6 +781,11 @@ window.TerrainMoto3D = (function () {
 
     renderer.render(scene, camera);
     updateProjectedPins();
+  }
+
+  function setRenderPaused(paused) {
+    renderPaused = !!paused;
+    if (!renderPaused) clock.getDelta();
   }
 
   function jumpToProgress(t, keepPlaying = false) {
@@ -886,6 +894,7 @@ window.TerrainMoto3D = (function () {
     setSpeed,
     setCameraMode,
     highlightStopPin,
-    getNearestStop
+    getNearestStop,
+    setRenderPaused
   };
 })();

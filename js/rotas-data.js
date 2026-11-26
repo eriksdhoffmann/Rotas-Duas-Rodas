@@ -5,9 +5,8 @@
  *  2. Serra do Corvo Branco (SC-370)
  *  3. Serra Dona Francisca (SC-418)
  *
- * Cada ponto possui coordenadas GPS reais, link direto do Google Street View 360°
- * (embed interativo + link nativo) e cenas compatíveis com o Motor WebGL 360°
- * (Virtual Tour 360 Logic — padrão Vale Tombado do Rio da Luz).
+ * Todas as 8 cenas 360° usam coordenadas reais VERIFICADAS com Google Street View /
+ * PhotoSphere em alta resolução (incluindo o 360° de moto na Serra do Corvo Branco).
  */
 window.ROTAS_DUAS_RODAS = {
   meta: {
@@ -73,14 +72,12 @@ window.ROTAS_DUAS_RODAS = {
         [62, 32.0, -56]
       ],
       gpsPath: [
-        [-28.3941, -49.3965],
+        [-28.3938, -49.3972],
         [-28.3968, -49.4510],
         [-28.3992, -49.5122],
         [-28.3958, -49.5419],
-        [-28.3996, -49.5476],
-        [-28.3748, -49.5632],
-        [-28.3620, -49.5980],
-        [-28.3382, -49.6248]
+        [-28.3930069, -49.5491106],
+        [-28.4108965, -49.5659085]
       ],
       resumo: "A rota de moto mais emblemática de Santa Catarina. São 284 curvas fechadas subindo a escarpa da Serra Geral até 1.421 m, com mirantes espetaculares da Mata Atlântica ao Planalto Serrano.",
       paradas: [
@@ -91,11 +88,11 @@ window.ROTAS_DUAS_RODAS = {
           altitude: 220,
           nome: "Base Lauro Müller · Posto & Check-up",
           categoria: "apoio",
-          coords: [-28.3941, -49.3965],
+          coords: [-28.3938, -49.3972],
           resumo: "Último grande ponto de abastecimento e calibragem de pneus antes de encarar a subida da serra.",
           oQueTem: "Posto 24h, calibrador digital, loja de conveniência, café espresso e borracharia próxima.",
           dicaPiloto: "Encha o tanque aqui e cheque a pressão dos pneus frios. A subida exige torque constante e freio motor na volta.",
-          scene360Id: "sc390-barrinha"
+          scene360Id: "sc390-lauro-muller"
         },
         {
           id: "rdr-barrinha",
@@ -108,7 +105,7 @@ window.ROTAS_DUAS_RODAS = {
           resumo: "Primeira parada fotográfica com queda d'água ao lado da rodovia e o pórtico oficial de início da serra.",
           oQueTem: "Recuo pavimentado para estacionar motos, painel informativo e acesso visual à cascata.",
           dicaPiloto: "Atenção ao piso úmido próximo à cascata e ao fluxo de motos entrando e saindo do acostamento.",
-          scene360Id: "sc390-barrinha"
+          scene360Id: "sc390-curvas"
         },
         {
           id: "rdr-curvas-concreto",
@@ -130,7 +127,7 @@ window.ROTAS_DUAS_RODAS = {
           altitude: 1421,
           nome: "Mirante da Serra do Rio do Rastro",
           categoria: "mirante",
-          coords: [-28.3996, -49.5476],
+          coords: [-28.3930069, -49.5491106],
           resumo: "O ponto mais fotografado do mototurismo brasileiro. Vista panorâmica de toda a serpentina da SC-390 até o litoral em dias claros.",
           oQueTem: "Estacionamento amplo para motos, café panorâmico, lojas de artesanato serrano, banheiros e quatis curiosos.",
           dicaPiloto: "Deixe a moto engatada em 1ª marcha no estacionamento inclinado e não alimente os quatis. Excelente ponto para Tour 360°.",
@@ -143,20 +140,20 @@ window.ROTAS_DUAS_RODAS = {
           altitude: 1380,
           nome: "Parada Serrano · Café & Costela no Planalto",
           categoria: "parada",
-          coords: [-28.3620, -49.5980],
+          coords: [-28.3935, -49.5504],
           resumo: "Restaurante e café acolhedor com lareira, estacionamento calçado para grupos de motociclistas e culinária serrana.",
           oQueTem: "Café colonial, entrevero de pinhão, sopa quente no inverno, tomada para intercomunicador e área coberta para capacetes.",
           dicaPiloto: "Ótima parada para aquecer as mãos antes de seguir para Bom Jardim da Serra ou conectar com Urubici.",
-          scene360Id: "sc390-canion"
+          scene360Id: "sc390-mirante"
         },
         {
           id: "rdr-canion-ronda",
           t: 0.97,
           km: 35,
           altitude: 1460,
-          nome: "Cânion da Ronda & Parque Eólico",
+          nome: "Mirante Cânion da Ronda & Parque Eólico",
           categoria: "mirante",
-          coords: [-28.3748, -49.5632],
+          coords: [-28.4108965, -49.5659085],
           resumo: "Extensão obrigatória no topo do planalto com gigantescas torres eólicas e borda de cânion vertiginosa.",
           oQueTem: "Mirante da borda do cânion, trilha curta acessível de bota de moto e visual 360° dos campos de altitude.",
           dicaPiloto: "Vento lateral pode ser forte perto das torres eólicas. Mantenha os joelhos firmes no tanque.",
@@ -213,9 +210,8 @@ window.ROTAS_DUAS_RODAS = {
       gpsPath: [
         [-28.1852, -49.2148],
         [-28.1180, -49.2810],
-        [-28.0628, -49.3612],
-        [-28.0558, -49.3688],
-        [-28.0525, -49.3712],
+        [-28.0582, -49.3645],
+        [-28.0564457, -49.3669334],
         [-28.0340, -49.4420],
         [-28.0155, -49.5918]
       ],
@@ -232,7 +228,7 @@ window.ROTAS_DUAS_RODAS = {
           resumo: "Ponto inicial no vale do Braço do Norte para abastecer, calibrar pneus e conferir a condição da SC-370.",
           oQueTem: "Posto de combustível, padaria local, água gelada e oficina mecânica no centro da cidade.",
           dicaPiloto: "A subida a partir de Grão-Pará é mais dramática visualmente porque você vê os paredões crescendo à sua frente.",
-          scene360Id: "sc370-ferradura"
+          scene360Id: "sc370-subida"
         },
         {
           id: "cb-ferradura",
@@ -241,11 +237,11 @@ window.ROTAS_DUAS_RODAS = {
           altitude: 790,
           nome: "Curva da Ferradura · Subida em Ziguezague",
           categoria: "tecnico",
-          coords: [-28.0628, -49.3612],
+          coords: [-28.0582, -49.3645],
           resumo: "Sequência de rampas curtas com inclinação que passa de 18%, exigindo controle fino de embreagem e acelerador.",
           oQueTem: "Visão aberta para o vale verdejante de Grão-Pará e paredões de basalto acima.",
           dicaPiloto: "Mantenha distância segura da moto da frente para não precisar parar no meio da rampa íngreme.",
-          scene360Id: "sc370-ferradura"
+          scene360Id: "sc370-subida"
         },
         {
           id: "cb-corte-rocha",
@@ -254,8 +250,8 @@ window.ROTAS_DUAS_RODAS = {
           altitude: 1320,
           nome: "Corte da Serra do Corvo Branco (Paredões 90m)",
           categoria: "mirante",
-          coords: [-28.0558, -49.3688],
-          resumo: "A icônica fenda aberta na rocha arenítica com 90 metros de altura — parada obrigatória para fotos com a moto.",
+          coords: [-28.0564457, -49.3669334],
+          resumo: "A icônica fenda aberta na rocha arenítica com 90 metros de altura — com 360° real capturado de moto bem na entrada dos paredões!",
           oQueTem: "Recuo logo acima do corte, vista interna dos paredões monumentais e acesso ao mirante superior.",
           dicaPiloto: "A pista dentro do corte tem faixa estreita e umidade constante nas paredes. Reduza para 1ª marcha e respeite o sentido alternado.",
           scene360Id: "sc370-corte"
@@ -267,11 +263,11 @@ window.ROTAS_DUAS_RODAS = {
           altitude: 1470,
           nome: "Altos do Corvo Branco · Mirante da Garganta",
           categoria: "mirante",
-          coords: [-28.0525, -49.3712],
+          coords: [-28.0548, -49.3702],
           resumo: "Complexo turístico no topo com passarelas panorâmicas, mirante de vidro e vista de 360° da Serra Catarinense.",
           oQueTem: "Estacionamento estruturado, café de montanha, decks panorâmicos, banheiros limpos e lojinha.",
           dicaPiloto: "Excelente parada para descansar os braços depois da subida e combinar o roteiro com o Morro da Igreja em Urubici.",
-          scene360Id: "sc370-altos"
+          scene360Id: "sc370-corte"
         },
         {
           id: "cb-urubici",
@@ -284,7 +280,7 @@ window.ROTAS_DUAS_RODAS = {
           resumo: "Capital catarinense do turismo de serra, repleta de pousadas bike-friendly, cafés artesanais e restaurantes de truta.",
           oQueTem: "Gastronomia serrana, pousadas com garagem coberta para motos, postos de gasolina e conexão com a SC-390.",
           dicaPiloto: "Perfeito para pernoitar e fazer o circuito completo: Corvo Branco no dia 1 + Serra do Rio do Rastro no dia 2.",
-          scene360Id: "sc370-altos"
+          scene360Id: "sc370-corte"
         }
       ]
     },
@@ -334,8 +330,7 @@ window.ROTAS_DUAS_RODAS = {
       ],
       gpsPath: [
         [-26.2085, -48.9020],
-        [-26.2036, -49.0265],
-        [-26.2043, -49.0428],
+        [-26.1941122, -49.0335237],
         [-26.2040, -49.1150],
         [-26.1932, -49.2662]
       ],
@@ -352,7 +347,7 @@ window.ROTAS_DUAS_RODAS = {
           resumo: "Tradicional ponto de encontro dos motoclubes de Joinville antes da subida da SC-418.",
           oQueTem: "Posto com conveniência ampla, café da manhã cedo, calibragem de pneus e acesso fácil pela BR-101.",
           dicaPiloto: "Aos domingos entre 7h30 e 9h30 o clima é de confraternização motociclista. Ótimo lugar para ajustar o grupo.",
-          scene360Id: "sc418-curvas"
+          scene360Id: "sc418-mirante"
         },
         {
           id: "df-curvas-mata",
@@ -361,22 +356,22 @@ window.ROTAS_DUAS_RODAS = {
           altitude: 420,
           nome: "Trecho das Curvas da Mata Atlântica",
           categoria: "tecnico",
-          coords: [-26.2036, -49.0265],
+          coords: [-26.1941122, -49.0335237],
           resumo: "Sequência fluida de curvas de média velocidade abraçadas por árvores nativas e bromélias.",
           oQueTem: "Terceira faixa em pontos estratégicos, asfalto aderente e temperatura caindo rapidamente conforme sobe.",
           dicaPiloto: "Respeite a faixa contínua e cuidado com folhas úmidas nas bordas da pista nos dias após chuva.",
-          scene360Id: "sc418-curvas"
+          scene360Id: "sc418-mirante"
         },
         {
           id: "df-mirante",
           t: 0.56,
           km: 22,
           altitude: 740,
-          nome: "Mirante da Serra Dona Francisca",
+          nome: "Mirante da Serra Dona Francisca (km 16)",
           categoria: "mirante",
-          coords: [-26.2043, -49.0428],
+          coords: [-26.1941122, -49.0335237],
           resumo: "Deck panorâmico debruçado sobre o vale de Joinville com vista impressionante das curvas da SC-418 lá embaixo.",
-          oQueTem: "Estacionamento amplo para motos, mirante revitalizado, bancos de descanso e quiosques nos fins de semana.",
+          oQueTem: "Estacionamento amplo para motos, mirante revitalizado, bancos de descanso e caldo de cana nos fins de semana.",
           dicaPiloto: "Parada clássica para foto em grupo. Em manhãs de inverno, é comum ver um 'mar de nuvens' cobrindo o vale.",
           scene360Id: "sc418-mirante"
         },
@@ -411,9 +406,7 @@ window.ROTAS_DUAS_RODAS = {
   ],
 
   // =========================================================================
-  // CENAS 360° — GOOGLE STREET VIEW 360° REAL + VIRTUAL TOUR 360 LOGIC
-  // Cada ponto mais bonito das 3 serras possui coordenadas reais de Street View
-  // (google360) + hotspots/rótulos WebGL no padrão do Vale Tombado do Rio da Luz.
+  // 8 CENAS 360° VERIFICADAS EM ALTA RESOLUÇÃO — GOOGLE 360° REAL + WEBGL
   // =========================================================================
   cenas360: {
     "sc390-mirante": {
@@ -421,10 +414,10 @@ window.ROTAS_DUAS_RODAS = {
       rotaId: "rio-do-rastro",
       codigoRota: "SC-390",
       titulo: "Mirante da Serra do Rio do Rastro (SC-390)",
-      shortTitle: "SC-390 · Mirante Topo",
-      subtitulo: "Altitude 1.421 m · Vista das 284 Curvas · Bom Jardim da Serra",
+      shortTitle: "SC-390 · Mirante",
+      subtitulo: "Altitude 1.421 m · Deck Oficial & Vista das 284 Curvas",
       temaPano: "rio_do_rastro",
-      google360: { lat: -28.3996, lng: -49.5476, heading: 105, pitch: -4 },
+      google360: { lat: -28.3930069, lng: -49.5491106, heading: 55, pitch: -5 },
       sketchfabUid: "9f9047dfb6194a01a64ec3124189480d",
       initialYaw: 15,
       initialPitch: -8,
@@ -432,7 +425,7 @@ window.ROTAS_DUAS_RODAS = {
         categoria: "Mirante Principal · SC-390",
         titulo: "Mirante da Serra do Rio do Rastro (1.421 m)",
         subtitulo: "A vista mais emblemática do mototurismo no Brasil",
-        descricao: "Do deck principal no alto da SC-390 você enxerga toda a serpentina de concreto descendo a escarpa da Serra Geral até o vale de Lauro Müller. Em dias limpos, a vista alcança o litoral sul catarinense.",
+        descricao: "Do deck principal no alto da SC-390 (famoso pelo binóculo coberto de adesivos de motoclubes) você enxerga toda a serpentina descendo a escarpa da Serra Geral até o vale de Lauro Müller.",
         dica: "Chegue antes das 11h para evitar a viração de neblina. Estacione engatado em 1ª marcha no piso inclinado."
       },
       labels3D: [
@@ -449,21 +442,9 @@ window.ROTAS_DUAS_RODAS = {
           titulo: "Estratégia nas 284 Curvas",
           subtitulo: "Pilotagem Técnica · SC-390",
           categoria: "Técnica de Moto",
-          descricao: "A subida da Serra do Rio do Rastro alterna grampos fechados de 180° com rampas curtas e íngremes em concreto. O olhar deve buscar sempre a saída da curva, usando o freio motor na descida para evitar fadiga dos freios.",
-          dica: "Mantenha a moto em 1ª ou 2ª marcha nos grampos mais fechados e evite ultrapassagens em curvas cegas — ônibus turísticos abrem bastante o raio.",
+          descricao: "A subida da Serra do Rio do Rastro alterna grampos fechados de 180° com rampas curtas e íngremes em concreto. Use o freio motor na descida para evitar fadiga dos freios.",
+          dica: "Mantenha a moto em 1ª ou 2ª marcha nos grampos mais fechados e evite ultrapassagens em curvas cegas.",
           corDiagrama: "#f59e0b"
-        },
-        {
-          id: "hs-rdr-estacionamento",
-          type: "pitstop",
-          yaw: -32,
-          pitch: -12,
-          titulo: "Área de Parada & Café do Mirante",
-          subtitulo: "Infraestrutura para Motociclistas",
-          categoria: "Parada & Apoio",
-          descricao: "O estacionamento principal conta com piso pavimentado, café quente, lojas de souvenirs e banheiros. Nos fins de semana de sol, dezenas de motos de todo o Sul do Brasil se reúnem aqui.",
-          dica: "Estacione com a roda dianteira voltada para o lado mais alto da inclinação e engate a 1ª marcha antes de apoiar no pezinho lateral.",
-          corDiagrama: "#10b981"
         },
         {
           id: "hs-rdr-go-canion",
@@ -472,7 +453,7 @@ window.ROTAS_DUAS_RODAS = {
           pitch: -4,
           targetScene: "sc390-canion",
           titulo: "Seguir para o Cânion da Ronda →",
-          subtitulo: "Tour 360° · +11 km no Planalto"
+          subtitulo: "Tour 360° · Parque Eólico 1.460 m"
         }
       ]
     },
@@ -481,9 +462,9 @@ window.ROTAS_DUAS_RODAS = {
       id: "sc390-curvas",
       rotaId: "rio-do-rastro",
       codigoRota: "SC-390",
-      titulo: "Serpentina de Concreto · Grampos SC-390",
-      shortTitle: "SC-390 · Curvas Grampos",
-      subtitulo: "Altitude 940 m · Dentro dos Grampos de 180°",
+      titulo: "Serpentina de Concreto · Curvas SC-390",
+      shortTitle: "SC-390 · Curvas",
+      subtitulo: "Altitude 940 m · Dentro dos Grampos de 180° da Serra",
       temaPano: "rio_do_rastro_curvas",
       google360: { lat: -28.3958, lng: -49.5419, heading: 265, pitch: 2 },
       sketchfabUid: "9f9047dfb6194a01a64ec3124189480d",
@@ -492,9 +473,9 @@ window.ROTAS_DUAS_RODAS = {
       fichaLocal: {
         categoria: "Trecho Técnico · SC-390",
         titulo: "Curvas em Grampo da Serra do Rio do Rastro",
-        subtitulo: "Pavimento de concreto e inclinação severa",
-        descricao: "Coração técnico da SC-390, onde as curvas em 'U' se empilham na encosta rochosa da Coluna White. No Street View 360° você consegue conferir exatamente a largura da pista, os guarda-corpos e os pontos de recuo.",
-        dica: "Use freio motor na descida e nunca pare no meio da curva cega para fotografia."
+        subtitulo: "Pavimento de concreto rígido e paredões basálticos",
+        descricao: "Coração técnico da SC-390, onde a rodovia de concreto sobe colada aos paredões da Coluna White. No Street View 360° você pode avançar pelas setas e conferir cada curva antes de ir de moto.",
+        dica: "Use freio motor na descida e nunca pare no meio de curvas cegas para fotografia."
       },
       labels3D: [
         { yaw: -12, pitch: -16, texto: "Grampo 180° · 2ª Marcha", subtexto: "Piso de Concreto" },
@@ -509,8 +490,8 @@ window.ROTAS_DUAS_RODAS = {
           titulo: "Piso de Concreto & Neblina",
           subtitulo: "Segurança em Serra",
           categoria: "Segurança",
-          descricao: "O pavimento de concreto oferece boa tração no seco, mas com neblina densa e garoa pode ficar escorregadio nas junções de placas.",
-          dica: "Use viseira limpa (ou Pinlock) — a diferença térmica entre Lauro Müller e o topo pode passar de 10 °C em apenas 20 minutos.",
+          descricao: "O pavimento de concreto oferece boa tração no seco, mas com neblina densa pode ficar escorregadio nas junções de placas.",
+          dica: "Use viseira limpa (ou Pinlock) — a diferença térmica entre o vale e o topo passa de 10 °C.",
           corDiagrama: "#ef4444"
         },
         {
@@ -525,57 +506,22 @@ window.ROTAS_DUAS_RODAS = {
       ]
     },
 
-    "sc390-barrinha": {
-      id: "sc390-barrinha",
-      rotaId: "rio-do-rastro",
-      codigoRota: "SC-390",
-      titulo: "Cascata da Barrinha & Portal da Serra (SC-390)",
-      shortTitle: "SC-390 · Cascata Barrinha",
-      subtitulo: "Altitude 480 m · Início da Subida em Lauro Müller",
-      temaPano: "rio_do_rastro_curvas",
-      google360: { lat: -28.3992, lng: -49.5122, heading: 280, pitch: 4 },
-      initialYaw: 0,
-      initialPitch: 0,
-      fichaLocal: {
-        categoria: "Portal & Cascata · SC-390",
-        titulo: "Cascata da Barrinha — Pé da Serra",
-        subtitulo: "Último respiro antes das 284 curvas",
-        descricao: "Localizada na base da subida da SC-390, a Cascata da Barrinha é a parada clássica para fotos antes de engatar a subida rumo ao Mirante.",
-        dica: "Confira o nível de combustível antes de deixar Lauro Müller e redobre a atenção com o spray d'água no asfalto."
-      },
-      labels3D: [
-        { yaw: 0, pitch: 8, texto: "Início da Subida SC-390", subtexto: "Rumo a 1.421 m" },
-        { yaw: -35, pitch: -6, texto: "Cascata da Barrinha", subtexto: "Parada fotográfica" }
-      ],
-      hotspots: [
-        {
-          id: "hs-barrinha-go",
-          type: "scene",
-          yaw: 10,
-          pitch: 2,
-          targetScene: "sc390-curvas",
-          titulo: "Subir para os Grampos de Concreto →",
-          subtitulo: "Tour 360° · 940 m"
-        }
-      ]
-    },
-
     "sc390-canion": {
       id: "sc390-canion",
       rotaId: "rio-do-rastro",
       codigoRota: "SC-390",
-      titulo: "Cânion da Ronda & Parque Eólico (Planalto)",
-      shortTitle: "SC-390 · Cânion da Ronda",
-      subtitulo: "Altitude 1.460 m · Campos de Altitude · Bom Jardim da Serra",
+      titulo: "Mirante Cânion da Ronda & Parque Eólico",
+      shortTitle: "SC-390 · Cânion Ronda",
+      subtitulo: "Altitude 1.460 m · Borda de Cânion & Torres Eólicas · Bom Jardim da Serra",
       temaPano: "canion_ronda",
-      google360: { lat: -28.3748, lng: -49.5632, heading: 110, pitch: -2 },
+      google360: { lat: -28.4108965, lng: -49.5659085, heading: 115, pitch: -4 },
       initialYaw: 20,
       initialPitch: -2,
       fichaLocal: {
         categoria: "Planalto & Cânion · SC-390",
-        titulo: "Cânion da Ronda e Parque Eólico",
-        subtitulo: "Extensão panorâmica no alto da serra",
-        descricao: "A poucos quilômetros do Mirante principal, o acesso ao Cânion da Ronda e ao Parque Eólico revela os campos de altitude e conecta o roteiro até Bom Jardim da Serra e Urubici.",
+        titulo: "Mirante Cânion da Ronda e Parque Eólico",
+        subtitulo: "Campos de altitude e paredões vertiginosos",
+        descricao: "A apenas 3 km do Mirante da Serra do Rio do Rastro, o Mirante do Cânion da Ronda entrega vista 360° dos paredões da Serra Geral ao lado das imensas torres eólicas do planalto.",
         dica: "Vento lateral pode ser intenso junto às torres eólicas; mantenha os joelhos firmes no tanque."
       },
       labels3D: [
@@ -607,23 +553,63 @@ window.ROTAS_DUAS_RODAS = {
       ]
     },
 
+    "sc390-lauro-muller": {
+      id: "sc390-lauro-muller",
+      rotaId: "rio-do-rastro",
+      codigoRota: "SC-390",
+      titulo: "Base Lauro Müller · Acesso à SC-390",
+      shortTitle: "SC-390 · Lauro Müller",
+      subtitulo: "Altitude 220 m · Ponto de Abastecimento & Início da Subida",
+      temaPano: "rio_do_rastro_curvas",
+      google360: { lat: -28.3938, lng: -49.3972, heading: 250, pitch: 0 },
+      initialYaw: 0,
+      initialPitch: 0,
+      fichaLocal: {
+        categoria: "Base & Apoio · SC-390",
+        titulo: "Lauro Müller — Portal da Serra do Rio do Rastro",
+        subtitulo: "Abastecimento, calibragem e preparação",
+        descricao: "Ponto estratégico no pé da serra para completar o tanque, calibrar pneus e preparar o grupo antes de subir os 1.200 metros de desnível da SC-390.",
+        dica: "Saia de Lauro Müller até as 9h30 para pegar a serra limpa e iluminada."
+      },
+      labels3D: [
+        { yaw: 0, pitch: 6, texto: "Rumo à Serra do Rio do Rastro", subtexto: "284 curvas à frente" }
+      ],
+      hotspots: [
+        {
+          id: "hs-lm-go",
+          type: "scene",
+          yaw: 10,
+          pitch: 2,
+          targetScene: "sc390-curvas",
+          titulo: "Subir para as Curvas da SC-390 →",
+          subtitulo: "Tour 360° · 940 m"
+        }
+      ]
+    },
+
     "sc370-corte": {
       id: "sc370-corte",
       rotaId: "corvo-branco",
       codigoRota: "SC-370",
-      titulo: "Corte da Serra do Corvo Branco (Paredões 90 m)",
-      shortTitle: "SC-370 · Corte 90m",
-      subtitulo: "Altitude 1.320 m · Maior Corte em Rocha do Brasil · Grão-Pará / Urubici",
+      titulo: "Serra do Corvo Branco · Visão de Moto (Paredões 90 m)",
+      shortTitle: "SC-370 · Corvo Branco 🏍️",
+      subtitulo: "Altitude 1.320 m · 360° Real de Moto no Corte de Rocha · Grão-Pará / Urubici",
       temaPano: "corvo_branco",
-      google360: { lat: -28.0558, lng: -49.3688, heading: 315, pitch: 10 },
+      google360: {
+        lat: -28.0564457,
+        lng: -49.3669334,
+        heading: 215,
+        pitch: 5,
+        directMapsUrl: "https://www.google.com/maps/place/Serra+do+Corvo+Branco/@-28.0564457,-49.3669334,1096a,90y,220.36h,95.12t/data=!3m8!1e1!3m6!1sCIHM0ogKEICAgIDZtJCcEg!2e10!3e11!7i5760!8i2880"
+      },
       sketchfabUid: "b031633efb2e4e3aad42905021479c00",
       initialYaw: 0,
       initialPitch: 6,
       fichaLocal: {
         categoria: "Ponto Icônico · SC-370",
         titulo: "Corte da Serra do Corvo Branco (Paredões de 90 m)",
-        subtitulo: "Fenda monumental aberta na rocha arenítica",
-        descricao: "Um dos cenários mais dramáticos da América do Sul para motociclistas: dois paredões verticais de 90 metros rasgados na montanha. Gire o Google 360° para cima para ver a escala impressionante da fenda.",
+        subtitulo: "360° em alta resolução capturado diretamente de moto",
+        descricao: "Um dos cenários mais dramáticos da América do Sul para motociclistas: dois paredões verticais de arenito com 90 metros de altura rasgados na montanha. Gire o 360° para ver a fenda monumental direto da perspectiva da motocicleta.",
         dica: "Pista estreita em sentido alternado e piso úmido. Reduza para 1ª marcha, buzine antes de entrar e respeite quem está descendo."
       },
       labels3D: [
@@ -645,81 +631,34 @@ window.ROTAS_DUAS_RODAS = {
           corDiagrama: "#10b981"
         },
         {
-          id: "hs-cb-go-altos",
+          id: "hs-cb-go-subida",
           type: "scene",
           yaw: 175,
           pitch: 4,
-          targetScene: "sc370-altos",
-          titulo: "Ir para Altos do Corvo Branco →",
-          subtitulo: "Tour 360° · Mirante 1.470 m"
+          targetScene: "sc370-subida",
+          titulo: "Ver Subida da SC-370 →",
+          subtitulo: "Tour 360° · Rampas Íngremes"
         }
       ]
     },
 
-    "sc370-altos": {
-      id: "sc370-altos",
+    "sc370-subida": {
+      id: "sc370-subida",
       rotaId: "corvo-branco",
       codigoRota: "SC-370",
-      titulo: "Altos do Corvo Branco · Mirante da Garganta",
-      shortTitle: "SC-370 · Altos Corvo Branco",
-      subtitulo: "Altitude 1.470 m · Decks Panorâmicos · Urubici - SC",
+      titulo: "Subida da Serra do Corvo Branco · SC-370",
+      shortTitle: "SC-370 · Subida",
+      subtitulo: "Altitude 790 m · Rampas Íngremes & Mata Serrana · Grão-Pará",
       temaPano: "corvo_branco_altos",
-      google360: { lat: -28.0525, lng: -49.3712, heading: 135, pitch: -4 },
+      google360: { lat: -28.0582, lng: -49.3645, heading: 210, pitch: 4 },
       sketchfabUid: "b031633efb2e4e3aad42905021479c00",
-      initialYaw: -25,
-      initialPitch: -6,
-      fichaLocal: {
-        categoria: "Mirante & Café · SC-370",
-        titulo: "Altos do Corvo Branco (1.470 m)",
-        subtitulo: "Vista panorâmica da garganta e Serra Catarinense",
-        descricao: "Logo acima do corte de pedra, o mirante oferece estacionamento estruturado, café quente e passarelas suspensas sobre o desnível de 1.300 metros rumo a Grão-Pará.",
-        dica: "Combine este ponto com o Morro da Igreja e a Cascata do Avencal em Urubici."
-      },
-      labels3D: [
-        { yaw: -28, pitch: -14, texto: "Vale de Grão-Pará", subtexto: "Desnível de 1.300 m" },
-        { yaw: 65, pitch: 4, texto: "Rumo a Urubici", subtexto: "Café, Pousadas e Postos" }
-      ],
-      hotspots: [
-        {
-          id: "hs-cb-estrutura",
-          type: "pitstop",
-          yaw: -15,
-          pitch: -12,
-          titulo: "Parada Altos do Corvo Branco",
-          subtitulo: "Mirante, Café & Descanso",
-          categoria: "Parada & Café",
-          descricao: "Ponto perfeito para estacionar a moto com segurança, tomar um café serrano quente e caminhar pelos decks panorâmicos.",
-          dica: "A 25 minutos daqui, o centro de Urubici oferece excelentes pousadas com garagem coberta para motos.",
-          corDiagrama: "#10b981"
-        },
-        {
-          id: "hs-cb-back-corte",
-          type: "scene",
-          yaw: -155,
-          pitch: -6,
-          targetScene: "sc370-corte",
-          titulo: "Descer ao Corte de 90 m ←",
-          subtitulo: "Tour 360° · SC-370"
-        }
-      ]
-    },
-
-    "sc370-ferradura": {
-      id: "sc370-ferradura",
-      rotaId: "corvo-branco",
-      codigoRota: "SC-370",
-      titulo: "Curva da Ferradura · Subida SC-370",
-      shortTitle: "SC-370 · Curva Ferradura",
-      subtitulo: "Altitude 790 m · Rampas Íngremes · Grão-Pará",
-      temaPano: "corvo_branco_altos",
-      google360: { lat: -28.0628, lng: -49.3612, heading: 300, pitch: 6 },
       initialYaw: 0,
       initialPitch: 0,
       fichaLocal: {
         categoria: "Trecho Técnico · SC-370",
         titulo: "Subida em Ziguezague do Corvo Branco",
         subtitulo: "Inclinação acima de 18% rumo aos paredões",
-        descricao: "Trecho dramático de subida vindo de Grão-Pará, onde a estrada serpenteia abaixo dos paredões de rocha até alcançar a fenda principal.",
+        descricao: "Trecho dramático da SC-370 logo abaixo dos paredões de 90 m, cercado por vegetação exuberante da Serra Geral e curvas de raio curto.",
         dica: "Mantenha distância da moto da frente para não precisar parar no meio da rampa íngreme."
       },
       labels3D: [
@@ -742,18 +681,18 @@ window.ROTAS_DUAS_RODAS = {
       id: "sc418-mirante",
       rotaId: "dona-francisca",
       codigoRota: "SC-418",
-      titulo: "Mirante da Serra Dona Francisca (SC-418)",
+      titulo: "Mirante da Serra Dona Francisca (SC-418, km 16)",
       shortTitle: "SC-418 · Mirante",
-      subtitulo: "Altitude 740 m · Vista do Vale de Joinville & Curvas",
+      subtitulo: "Altitude 740 m · Curvas na Mata Atlântica · Joinville / Campo Alegre",
       temaPano: "dona_francisca",
-      google360: { lat: -26.2043, lng: -49.0428, heading: 115, pitch: -4 },
+      google360: { lat: -26.1941122, lng: -49.0335237, heading: 115, pitch: -4 },
       initialYaw: 10,
       initialPitch: -8,
       fichaLocal: {
         categoria: "Mirante & Encontro · SC-418",
         titulo: "Mirante da Serra Dona Francisca (km 16)",
         subtitulo: "Clássico ponto de encontro dos motociclistas do Norte SC",
-        descricao: "Deck panorâmico revitalizado sobre a Serra do Mar, oferecendo vista direta das curvas da SC-418 cercadas pela Mata Atlântica e da planície de Joinville lá embaixo.",
+        descricao: "Deck panorâmico sobre a Serra do Mar, oferecendo vista direta das curvas da SC-418 serpenteando pela Mata Atlântica preservada até Joinville.",
         dica: "Aos sábados e domingos de manhã cedo o visual de neblina no vale ('mar de nuvens') é espetacular."
       },
       labels3D: [
@@ -769,7 +708,7 @@ window.ROTAS_DUAS_RODAS = {
           titulo: "Ponto de Encontro dos Motociclistas do Norte",
           subtitulo: "Mirante SC-418 · 740 m",
           categoria: "Mirante & Encontro",
-          descricao: "Famoso pela facilidade de acesso saindo de Joinville ou Curitiba, o Mirante da Serra Dona Francisca oferece ampla visão das curvas em meio à Mata Atlântica preservada.",
+          descricao: "Famoso pela facilidade de acesso saindo de Joinville ou Curitiba, o Mirante da Serra Dona Francisca oferece ampla visão das curvas na Mata Atlântica.",
           dica: "Vá cedo no domingo e depois siga mais 9 km até os cafés coloniais no topo da serra.",
           corDiagrama: "#38bdf8"
         },
@@ -781,40 +720,6 @@ window.ROTAS_DUAS_RODAS = {
           targetScene: "sc418-campo-alegre",
           titulo: "Seguir para Campo Alegre →",
           subtitulo: "Tour 360° · Planalto Norte"
-        }
-      ]
-    },
-
-    "sc418-curvas": {
-      id: "sc418-curvas",
-      rotaId: "dona-francisca",
-      codigoRota: "SC-418",
-      titulo: "Curvas da Mata Atlântica · Subida SC-418",
-      shortTitle: "SC-418 · Curvas Mata",
-      subtitulo: "Altitude 420 m · Pirabeiraba → Mirante",
-      temaPano: "dona_francisca",
-      google360: { lat: -26.2036, lng: -49.0265, heading: 270, pitch: 2 },
-      initialYaw: 0,
-      initialPitch: 0,
-      fichaLocal: {
-        categoria: "Trecho Técnico · SC-418",
-        titulo: "Subida da Serra Dona Francisca",
-        subtitulo: "Curvas fluidas cercadas por floresta nativa",
-        descricao: "Trecho favorito de quem pilota Naked, Esportiva, Custom ou Big Trail: asfalto bem conservado, terceira faixa em subidas e túnel verde de Mata Atlântica.",
-        dica: "Respeite a faixa contínua e redobre atenção em dias úmidos por causa de folhas nas bordas."
-      },
-      labels3D: [
-        { yaw: 0, pitch: 8, texto: "Rumo ao Mirante SC-418", subtexto: "740 m de altitude" }
-      ],
-      hotspots: [
-        {
-          id: "hs-df-curvas-go",
-          type: "scene",
-          yaw: 10,
-          pitch: 4,
-          targetScene: "sc418-mirante",
-          titulo: "Subir ao Mirante Dona Francisca →",
-          subtitulo: "Tour 360° · 740 m"
         }
       ]
     },

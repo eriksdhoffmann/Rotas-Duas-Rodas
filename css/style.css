@@ -976,6 +976,12 @@ button, input {
   pointer-events: none;
 }
 
+.google360-loading[hidden],
+.google360-shell[hidden],
+[hidden] {
+  display: none !important;
+}
+
 .google360-spinner {
   width: 34px;
   height: 34px;
@@ -1049,10 +1055,16 @@ button, input {
   gap: 6px;
   padding: 5px;
   border-radius: 999px;
-  background: rgba(16, 22, 26, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(16, 22, 26, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   overflow-x: auto;
-  max-width: 64vw;
+  max-width: 68vw;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.pano360-pills::-webkit-scrollbar {
+  display: none;
 }
 
 .pano-pill {
@@ -1074,14 +1086,16 @@ button, input {
 
 .pano360-title-badge {
   position: absolute;
-  top: 72px;
+  bottom: 76px;
   left: 16px;
   z-index: 64;
+  max-width: 380px;
   padding: 10px 14px;
   border-radius: 12px;
-  background: rgba(16, 22, 26, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(16, 22, 26, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(10px);
+  pointer-events: none;
 }
 
 .pano360-title-badge h2 {
@@ -1180,6 +1194,7 @@ button, input {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .dock360-btn.is-active {

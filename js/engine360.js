@@ -95,15 +95,16 @@ window.Engine360 = (function () {
   `;
 
   function buildGoogleEmbedUrl(g) {
-    // Google Maps Street View 360° interativo por coordenada + ângulo (heading/pitch)
+    // Endpoint oficial moderno Google Maps Embed Street View / PhotoSphere (HTTP 200 sem X-Frame-Options)
     const lat = g.lat;
     const lng = g.lng;
-    const heading = g.heading || 0;
-    const pitchVal = g.pitch || 0;
-    return `https://maps.google.com/maps?q=&layer=c&cbll=${lat},${lng}&cbp=12,${heading},0,0,${pitchVal}&ie=UTF8&iwloc=&output=svembed`;
+    const heading = g.heading != null ? g.heading : 0;
+    const pitchVal = g.pitch != null ? g.pitch : 0;
+    return `https://www.google.com/maps/embed?origin=mfe&pb=!6m7!1m6!2m2!1d${lat}!2d${lng}!3f${heading}!4f${pitchVal}!5f0.78`;
   }
 
   function buildGoogleExternalPanoUrl(g) {
+    if (g.directMapsUrl) return g.directMapsUrl;
     return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${g.lat},${g.lng}&heading=${g.heading || 0}&pitch=${g.pitch || 0}`;
   }
 
@@ -488,6 +489,9 @@ window.Engine360 = (function () {
   function open(sceneId) {
     active = true;
     viewMode = "google";
+    if (window.TerrainMoto3D && window.TerrainMoto3D.setRenderPaused) {
+      window.TerrainMoto3D.setRenderPaused(true);
+    }
     overlayEl.classList.add("is-open");
     overlayEl.setAttribute("aria-hidden", "false");
     loadScene(sceneId);
@@ -502,6 +506,9 @@ window.Engine360 = (function () {
     overlayEl.classList.remove("is-open");
     overlayEl.setAttribute("aria-hidden", "true");
     cancelAnimationFrame(rafId);
+    if (window.TerrainMoto3D && window.TerrainMoto3D.setRenderPaused) {
+      window.TerrainMoto3D.setRenderPaused(false);
+    }
   }
 
   function init() {
