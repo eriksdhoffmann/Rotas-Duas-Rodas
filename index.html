@@ -198,26 +198,46 @@
     </form>
   </aside>
 
-  <!-- 7. OVERLAY TOUR VIRTUAL 360° (VIRTUAL TOUR 360 LOGIC — GEOHEREDITAS) -->
+  <!-- 7. OVERLAY TOUR VIRTUAL 360° (GOOGLE STREET VIEW 360° REAL + VIRTUAL TOUR 360 LOGIC) -->
   <section id="tour360Overlay" class="tour360-overlay" aria-hidden="true" aria-label="Tour Virtual 360 Graus">
+    <!-- Camada Google Street View 360° Real -->
+    <div id="google360Shell" class="google360-shell">
+      <div id="google360Loading" class="google360-loading">
+        <div class="google360-spinner"></div>
+        <span>Carregando Google Street View 360° real…</span>
+      </div>
+      <iframe
+        id="google360Frame"
+        class="google360-frame"
+        title="Google Street View 360° Interativo"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen></iframe>
+    </div>
+
+    <!-- Camada Motor WebGL 360° (Padrão Rio da Luz: Hotspots + Rótulos + Estúdio Criador) -->
     <canvas id="pano360Canvas"></canvas>
     <div id="pano360Labels"></div>
     <div id="pano360Hotspots"></div>
 
     <div class="pano360-topbar">
       <button type="button" id="btnClose360" class="pano360-back-btn">← Voltar à Moto 3D</button>
-      <div id="pano360Pills" class="pano360-pills" aria-label="Cenas 360° disponíveis"></div>
+      <div id="pano360Pills" class="pano360-pills" aria-label="Pontos 360° das 3 serras"></div>
     </div>
 
     <div class="pano360-title-badge">
       <h2 id="pano360Title">Mirante 360°</h2>
-      <p id="pano360Sub">Arraste para girar · Role para dar zoom</p>
+      <p id="pano360Sub">Arraste para girar 360° · Use as setas para percorrer a serra</p>
     </div>
 
     <div class="pano360-dock" role="toolbar" aria-label="Controles do Tour 360°">
-      <button type="button" id="btn360AutoRotate" class="dock360-btn">▶ Giro Automático</button>
-      <button type="button" id="btn360Labels" class="dock360-btn">Aa Rótulos 3D</button>
-      <button type="button" id="btn360Creator" class="dock360-btn">🛠️ Estúdio Criador 360°</button>
+      <button type="button" id="btnModeGoogle360" class="dock360-btn is-active" title="Visualizar foto 360° real do Google Street View">🌍 Google 360° Real</button>
+      <button type="button" id="btnModeWebGL360" class="dock360-btn" title="Motor WebGL 360° com Hotspots e Rótulos (padrão Rio da Luz)">🎯 WebGL + Hotspots</button>
+      <button type="button" id="btn360FichaLocal" class="dock360-btn" title="Abrir ficha do local, dicas de moto e modelo 3D">📖 Ficha &amp; 3D</button>
+      <button type="button" id="btn360AutoRotate" class="dock360-btn" hidden>▶ Giro</button>
+      <button type="button" id="btn360Labels" class="dock360-btn" hidden>Aa Rótulos</button>
+      <button type="button" id="btn360Creator" class="dock360-btn">🛠️ Estúdio 360°</button>
+      <a id="btnOpenGoogleExternal" class="dock360-btn dock360-link" href="#" target="_blank" rel="noopener" title="Abrir este ponto diretamente no Google Maps 360°">↗ Google Maps</a>
     </div>
 
     <!-- Estúdio Criador 360° (Pilar D: Raycasting Inverso + Upload de Foto 360° própria) -->

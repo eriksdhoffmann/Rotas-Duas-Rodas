@@ -946,6 +946,55 @@ button, input {
   pointer-events: auto;
 }
 
+.google360-shell {
+  position: absolute;
+  inset: 0;
+  z-index: 61;
+  background: #0d1216;
+}
+
+.google360-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.google360-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(13, 18, 22, 0.85);
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.google360-spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: var(--accent-emerald);
+  animation: spin360 0.85s linear infinite;
+}
+
+@keyframes spin360 {
+  to { transform: rotate(360deg); }
+}
+
+.dock360-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
 #pano360Canvas {
   position: absolute;
   inset: 0;

@@ -1,18 +1,23 @@
 /**
- * Motor WebGL 360° Equiretangular — Virtual Tour 360 Logic (Rotas Duas Rodas SC)
- * Implementa os 4 Pilares Matemáticos do projeto Geohereditas / Geoturismo Interativo:
- *   Pilar A: Fragment Shader WebGL equiretangular 2:1 (Yaw [-180°,180°], Pitch [-90°,90°])
- *   Pilar B: Projeção direta 3D -> 2D `sphericalToScreen(pitch, yaw)` a 60 FPS
- *   Pilar C: Rótulos geográficos 3D flutuantes sobre a paisagem (toggle `Aa`)
- *   Pilar D: Raycasting inverso `screenToSpherical(mouseX, mouseY)` + Estúdio Criador 360°
+ * Motor Dual 360° — Google Street View 360° Real + WebGL Equiretangular (Padrão Rio da Luz)
+ * Combina:
+ *   1. Google Street View 360° Real embutido nos pontos mais bonitos das 3 serras (SC-390, SC-370, SC-418)
+ *   2. Motor WebGL 360° Equiretangular (4 Pilares do Virtual Tour 360 Logic — Geohereditas / Rio da Luz):
+ *      - Pilar A: Fragment Shader WebGL 2:1
+ *      - Pilar B: sphericalToScreen(pitch, yaw) para hotspots clicáveis
+ *      - Pilar C: Rótulos geográficos 3D flutuantes (Aa)
+ *      - Pilar D: screenToSpherical(mouseX, mouseY) + Estúdio Criador 360° (upload de foto 360° própria)
+ *   3. Modal Split-View Editorial com suporte a Modelo 3D Sketchfab real das serras catarinenses
  */
 window.Engine360 = (function () {
   const DEG = Math.PI / 180;
   const RAD = 180 / Math.PI;
 
   let overlayEl, canvas, gl, program, texture;
+  let googleShellEl, googleFrameEl, googleLoadingEl, googleExternalLink;
   let hotspotsEl, labelsEl, sceneTitleEl, sceneSubEl, pillsEl;
   let active = false;
+  let viewMode = "google"; // "google" | "webgl"
   let rafId = null;
 
   let currentScene = null;
@@ -33,8 +38,8 @@ window.Engine360 = (function () {
   let lastX = 0;
   let lastY = 0;
 
-  let customTextures = new Map();
-  let customHotspots = {};
+  const customTextures = new Map();
+  const customHotspots = {};
 
   const VERT_SRC = `
     attribute vec2 a_pos;
@@ -45,7 +50,6 @@ window.Engine360 = (function () {
     }
   `;
 
-  // Pilar A: Projeção equiretangular 2:1 na esfera WebGL
   const FRAG_SRC = `
     precision highp float;
     varying vec2 v_ndc;
@@ -65,7 +69,6 @@ window.Engine360 = (function () {
         1.0
       ));
 
-      // Rotação Pitch (eixo X)
       float cp = cos(u_pitch);
       float sp = sin(u_pitch);
       vec3 pDir = vec3(
@@ -74,7 +77,6 @@ window.Engine360 = (function () {
         -dir.y * sp + dir.z * cp
       );
 
-      // Rotação Yaw (eixo Y)
       float cy = cos(u_yaw);
       float sy = sin(u_yaw);
       vec3 wDir = vec3(
@@ -91,6 +93,19 @@ window.Engine360 = (function () {
       gl_FragColor = texture2D(u_tex, vec2(u, v));
     }
   `;
+
+  function buildGoogleEmbedUrl(g) {
+    // Google Maps Street View 360° interativo por coordenada + ângulo (heading/pitch)
+    const lat = g.lat;
+    const lng = g.lng;
+    const heading = g.heading || 0;
+    const pitchVal = g.pitch || 0;
+    return `https://maps.google.com/maps?q=&layer=c&cbll=${lat},${lng}&cbp=12,${heading},0,0,${pitchVal}&ie=UTF8&iwloc=&output=svembed`;
+  }
+
+  function buildGoogleExternalPanoUrl(g) {
+    return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${g.lat},${g.lng}&heading=${g.heading || 0}&pitch=${g.pitch || 0}`;
+  }
 
   function compileShader(type, src) {
     const sh = gl.createShader(type);
@@ -142,7 +157,6 @@ window.Engine360 = (function () {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
   }
 
-  // Pilar B: Projeção Direta 3D -> 2D
   function sphericalToScreen(pDeg, yDeg) {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
@@ -153,14 +167,12 @@ window.Engine360 = (function () {
     const wy = Math.sin(pr);
     const wz = Math.cos(pr) * Math.cos(yr);
 
-    // Rotação inversa por -yaw
     const cy = Math.cos(-yaw * DEG);
     const sy = Math.sin(-yaw * DEG);
     const x1 = wx * cy + wz * sy;
     const y1 = wy;
     const z1 = -wx * sy + wz * cy;
 
-    // Rotação inversa por -pitch
     const cp = Math.cos(-pitch * DEG);
     const sp = Math.sin(-pitch * DEG);
     const cx = x1;
@@ -177,7 +189,6 @@ window.Engine360 = (function () {
     };
   }
 
-  // Pilar D: Raycasting Inverso (Tela 2D -> Pitch e Yaw)
   function screenToSpherical(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
@@ -215,8 +226,7 @@ window.Engine360 = (function () {
   }
 
   function renderDOMOverlays() {
-    if (!currentScene) return;
-    // Hotspots
+    if (!currentScene || viewMode !== "webgl") return;
     const hsNodes = hotspotsEl.children;
     const list = getSceneHotspots(currentScene);
     for (let i = 0; i < list.length && i < hsNodes.length; i++) {
@@ -233,7 +243,6 @@ window.Engine360 = (function () {
       }
     }
 
-    // Pilar C: Rótulos 3D Flutuantes
     const lblNodes = labelsEl.children;
     const labels = currentScene.labels3D || [];
     for (let i = 0; i < labels.length && i < lblNodes.length; i++) {
@@ -294,7 +303,7 @@ window.Engine360 = (function () {
     }, 340);
   }
 
-  function openSplitModal(hs) {
+  function openSplitModal(hs, useSketchfab = false) {
     const modal = document.getElementById("splitModal360");
     const visual = document.getElementById("splitModalVisual");
     const badge = document.getElementById("splitModalBadge");
@@ -309,40 +318,54 @@ window.Engine360 = (function () {
     desc.textContent = hs.descricao || "";
     tip.textContent = hs.dica || "Mantenha a manutenção da moto em dia e aproveite a serra com segurança.";
 
-    // Visual ilustrativo editorial vetorial à esquerda (sem placeholders quebrados)
-    const accent = hs.corDiagrama || "#10b981";
-    visual.innerHTML = `
-      <svg viewBox="0 0 600 440" class="split-editorial-svg" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="svSky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#132230"/>
-            <stop offset="100%" stop-color="#2c4857"/>
-          </linearGradient>
-        </defs>
-        <rect width="600" height="440" fill="url(#svSky)"/>
-        <path d="M0 300 L110 185 L230 245 L370 135 L500 225 L600 175 L600 440 L0 440 Z" fill="#1c342b"/>
-        <path d="M0 340 L160 250 L290 295 L445 205 L600 280 L600 440 L0 440 Z" fill="#13261f"/>
-        <path d="M75 435 C175 370, 420 385, 390 330 C360 285, 210 315, 225 270 C240 230, 390 245, 420 198"
-              fill="none" stroke="#dce3e8" stroke-width="14" stroke-linecap="round"/>
-        <path d="M75 435 C175 370, 420 385, 390 330 C360 285, 210 315, 225 270 C240 230, 390 245, 420 198"
-              fill="none" stroke="#2c333a" stroke-width="10" stroke-linecap="round"/>
-        <path d="M75 435 C175 370, 420 385, 390 330 C360 285, 210 315, 225 270 C240 230, 390 245, 420 198"
-              fill="none" stroke="${accent}" stroke-width="2" stroke-dasharray="7 7" stroke-linecap="round"/>
-        <circle cx="420" cy="198" r="14" fill="${accent}" opacity="0.28"/>
-        <circle cx="420" cy="198" r="6" fill="${accent}"/>
-        <line x1="420" y1="198" x2="355" y2="115" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 4"/>
-        <rect x="210" y="78" width="215" height="44" rx="8" fill="rgba(15,23,28,0.86)" stroke="${accent}" stroke-width="1"/>
-        <text x="317" y="98" text-anchor="middle" fill="#ffffff" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700">${currentScene.titulo.slice(0, 28)}</text>
-        <text x="317" y="114" text-anchor="middle" fill="#cbd5e1" font-family="JetBrains Mono, monospace" font-size="10">YAW ${hs.yaw}° · PITCH ${hs.pitch}°</text>
-      </svg>
-    `;
+    if (useSketchfab && currentScene && currentScene.sketchfabUid) {
+      visual.innerHTML = `
+        <iframe
+          title="Modelo 3D — ${currentScene.titulo}"
+          src="https://sketchfab.com/models/${currentScene.sketchfabUid}/embed?autostart=1&ui_infos=0&ui_watermark_link=0"
+          style="width:100%;height:100%;min-height:360px;border:0;"
+          allow="autoplay; fullscreen; xr-spatial-tracking"
+          allowfullscreen></iframe>
+      `;
+    } else {
+      const accent = hs.corDiagrama || "#10b981";
+      const g = currentScene && currentScene.google360;
+      const coordTxt = g ? `${g.lat.toFixed(4)}, ${g.lng.toFixed(4)}` : `YAW ${hs.yaw || 0}°`;
+      visual.innerHTML = `
+        <svg viewBox="0 0 600 440" class="split-editorial-svg" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="svSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#132230"/>
+              <stop offset="100%" stop-color="#2c4857"/>
+            </linearGradient>
+          </defs>
+          <rect width="600" height="440" fill="url(#svSky)"/>
+          <path d="M0 300 L110 185 L230 245 L370 135 L500 225 L600 175 L600 440 L0 440 Z" fill="#1c342b"/>
+          <path d="M0 340 L160 250 L290 295 L445 205 L600 280 L600 440 L0 440 Z" fill="#13261f"/>
+          <path d="M75 435 C175 370, 420 385, 390 330 C360 285, 210 315, 225 270 C240 230, 390 245, 420 198"
+                fill="none" stroke="#dce3e8" stroke-width="14" stroke-linecap="round"/>
+          <path d="M75 435 C175 370, 420 385, 390 330 C360 285, 210 315, 225 270 C240 230, 390 245, 420 198"
+                fill="none" stroke="#2c333a" stroke-width="10" stroke-linecap="round"/>
+          <path d="M75 435 C175 370, 420 385, 390 330 C360 285, 210 315, 225 270 C240 230, 390 245, 420 198"
+                fill="none" stroke="${accent}" stroke-width="2" stroke-dasharray="7 7" stroke-linecap="round"/>
+          <circle cx="420" cy="198" r="14" fill="${accent}" opacity="0.28"/>
+          <circle cx="420" cy="198" r="6" fill="${accent}"/>
+          <line x1="420" y1="198" x2="355" y2="115" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <rect x="195" y="76" width="245" height="46" rx="8" fill="rgba(15,23,28,0.88)" stroke="${accent}" stroke-width="1"/>
+          <text x="317" y="96" text-anchor="middle" fill="#ffffff" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700">${(currentScene.shortTitle || currentScene.titulo).slice(0, 30)}</text>
+          <text x="317" y="113" text-anchor="middle" fill="#cbd5e1" font-family="JetBrains Mono, monospace" font-size="10">GPS ${coordTxt}</text>
+        </svg>
+      `;
+    }
 
     modal.classList.add("is-open");
   }
 
   function closeSplitModal() {
     const modal = document.getElementById("splitModal360");
+    const visual = document.getElementById("splitModalVisual");
     if (modal) modal.classList.remove("is-open");
+    if (visual) visual.innerHTML = "";
   }
 
   function resize() {
@@ -360,6 +383,8 @@ window.Engine360 = (function () {
   function renderLoop() {
     if (!active) return;
     rafId = requestAnimationFrame(renderLoop);
+
+    if (viewMode !== "webgl") return;
 
     if (autoRotate && !isDragging) {
       targetYaw += 0.08;
@@ -384,6 +409,28 @@ window.Engine360 = (function () {
     renderDOMOverlays();
   }
 
+  function applyViewMode(mode) {
+    viewMode = mode;
+    const isGoogle = mode === "google";
+
+    googleShellEl.hidden = !isGoogle;
+    canvas.style.display = isGoogle ? "none" : "block";
+    hotspotsEl.style.display = isGoogle ? "none" : "block";
+    labelsEl.style.display = isGoogle ? "none" : "block";
+
+    document.getElementById("btnModeGoogle360").classList.toggle("is-active", isGoogle);
+    document.getElementById("btnModeWebGL360").classList.toggle("is-active", !isGoogle);
+
+    // Mostra controles específicos do WebGL apenas no modo WebGL
+    document.getElementById("btn360AutoRotate").hidden = isGoogle;
+    document.getElementById("btn360Labels").hidden = isGoogle;
+
+    if (isGoogle && currentScene && currentScene.google360) {
+      googleLoadingEl.hidden = false;
+      googleFrameEl.src = buildGoogleEmbedUrl(currentScene.google360);
+    }
+  }
+
   function buildScenePills() {
     if (!pillsEl) return;
     pillsEl.innerHTML = "";
@@ -392,7 +439,7 @@ window.Engine360 = (function () {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "pano-pill" + (currentScene && currentScene.id === sc.id ? " is-active" : "");
-      btn.textContent = sc.titulo.split(" (")[0].replace("Mirante da ", "").replace("Corte da ", "Corte ");
+      btn.textContent = sc.shortTitle || sc.titulo;
       btn.addEventListener("click", () => loadScene(sc.id));
       pillsEl.appendChild(btn);
     });
@@ -412,6 +459,13 @@ window.Engine360 = (function () {
     sceneTitleEl.textContent = sc.titulo;
     sceneSubEl.textContent = sc.subtitulo;
 
+    if (sc.google360) {
+      googleExternalLink.href = buildGoogleExternalPanoUrl(sc.google360);
+      googleExternalLink.hidden = false;
+    } else {
+      googleExternalLink.hidden = true;
+    }
+
     if (customTextures.has(sc.id)) {
       uploadTextureSource(customTextures.get(sc.id));
     } else {
@@ -421,10 +475,19 @@ window.Engine360 = (function () {
 
     rebuildOverlayElements();
     buildScenePills();
+
+    // Se o usuário subiu uma foto 360° própria para esta cena, abre no WebGL;
+    // caso contrário, usa o Google Street View 360° Real por padrão!
+    if (customTextures.has(sc.id) || !sc.google360) {
+      applyViewMode("webgl");
+    } else {
+      applyViewMode(viewMode);
+    }
   }
 
   function open(sceneId) {
     active = true;
+    viewMode = "google";
     overlayEl.classList.add("is-open");
     overlayEl.setAttribute("aria-hidden", "false");
     loadScene(sceneId);
@@ -435,6 +498,7 @@ window.Engine360 = (function () {
   function close() {
     active = false;
     closeSplitModal();
+    if (googleFrameEl) googleFrameEl.src = "about:blank";
     overlayEl.classList.remove("is-open");
     overlayEl.setAttribute("aria-hidden", "true");
     cancelAnimationFrame(rafId);
@@ -443,6 +507,10 @@ window.Engine360 = (function () {
   function init() {
     overlayEl = document.getElementById("tour360Overlay");
     canvas = document.getElementById("pano360Canvas");
+    googleShellEl = document.getElementById("google360Shell");
+    googleFrameEl = document.getElementById("google360Frame");
+    googleLoadingEl = document.getElementById("google360Loading");
+    googleExternalLink = document.getElementById("btnOpenGoogleExternal");
     hotspotsEl = document.getElementById("pano360Hotspots");
     labelsEl = document.getElementById("pano360Labels");
     sceneTitleEl = document.getElementById("pano360Title");
@@ -451,7 +519,10 @@ window.Engine360 = (function () {
 
     initWebGL();
 
-    // Arrasto esférico com inércia + clique do Modo Criador (Pilar D)
+    googleFrameEl.addEventListener("load", () => {
+      googleLoadingEl.hidden = true;
+    });
+
     canvas.addEventListener("pointerdown", (e) => {
       isDragging = true;
       dragMoved = false;
@@ -476,7 +547,7 @@ window.Engine360 = (function () {
 
     canvas.addEventListener("pointerup", (e) => {
       isDragging = false;
-      if (!dragMoved && creatorMode) {
+      if (!dragMoved && creatorMode && viewMode === "webgl") {
         const ang = screenToSpherical(e.clientX, e.clientY);
         document.getElementById("creatorYaw").value = ang.yaw;
         document.getElementById("creatorPitch").value = ang.pitch;
@@ -494,11 +565,25 @@ window.Engine360 = (function () {
       { passive: false }
     );
 
-    // Controles do Tour 360°
     document.getElementById("btnClose360").addEventListener("click", close);
     document.getElementById("btnCloseSplitModal").addEventListener("click", closeSplitModal);
     document.getElementById("splitModal360").addEventListener("click", (e) => {
       if (e.target.id === "splitModal360") closeSplitModal();
+    });
+
+    document.getElementById("btnModeGoogle360").addEventListener("click", () => applyViewMode("google"));
+    document.getElementById("btnModeWebGL360").addEventListener("click", () => applyViewMode("webgl"));
+
+    document.getElementById("btn360FichaLocal").addEventListener("click", () => {
+      if (!currentScene) return;
+      const ficha = currentScene.fichaLocal || {
+        categoria: currentScene.codigoRota || "Mirante SC",
+        titulo: currentScene.titulo,
+        subtitulo: currentScene.subtitulo,
+        descricao: "Ponto panorâmico integrado ao Tour Virtual 360°.",
+        dica: "Aproveite a vista e pilote com segurança."
+      };
+      openSplitModal(ficha, Boolean(currentScene.sketchfabUid));
     });
 
     const btnAuto = document.getElementById("btn360AutoRotate");
@@ -520,9 +605,11 @@ window.Engine360 = (function () {
       creatorMode = !creatorMode;
       btnCreator.classList.toggle("is-active", creatorMode);
       creatorPanel.hidden = !creatorMode;
+      if (creatorMode && viewMode !== "webgl") {
+        applyViewMode("webgl");
+      }
     });
 
-    // Upload de Foto 360° própria (Drone / Insta360)
     document.getElementById("creatorPhotoInput").addEventListener("change", (e) => {
       const file = e.target.files && e.target.files[0];
       if (!file || !currentScene) return;
@@ -530,13 +617,13 @@ window.Engine360 = (function () {
       img.onload = () => {
         customTextures.set(currentScene.id, img);
         uploadTextureSource(img);
+        applyViewMode("webgl");
         document.getElementById("creatorCoordsHint").textContent =
-          `Foto 360° "${file.name}" aplicada na cena atual!`;
+          `Foto 360° "${file.name}" aplicada no Motor WebGL (padrão Rio da Luz)!`;
       };
       img.src = URL.createObjectURL(file);
     });
 
-    // Adicionar novo hotspot motociclista via Modo Criador
     document.getElementById("btnCreatorAddHotspot").addEventListener("click", () => {
       if (!currentScene) return;
       const titulo = document.getElementById("creatorTitle").value.trim();
